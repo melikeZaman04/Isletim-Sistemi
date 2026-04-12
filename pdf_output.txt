@@ -1,0 +1,239 @@
+\n--- PAGE 0 ---\nİşletim Sistemleri
+CPU Scheduling
+Bu dersin içeriği hazırlanırken Operating System Concepts (Silberschatz, Galvin and Gagne) kitabı ve 
+Prof. Dr. M. Ali Akcayol'un (Gazi Üniversitesi Bilgisayar Mühendisliği Bölümü) ders sunumlarından faydalanılmıştır.
+https://codex.cs.yale.edu/avi/os -book/OS9/slide -dir/index.html
+http://w3.gazi.edu.tr/~akcayol/BMOS.htmDr. Öğr. Üyesi Ertan Bütün
+1\n--- PAGE 1 ---\nKonular
+Temel kavramlar
+Scheduling kriterleri
+Scheduling algoritmaları
+Thread Scheduling
+Multiple -Processor Scheduling
+Gerçek zamanlı (Real -Time )CPU scheduling
+2\n--- PAGE 2 ---\nİşletim sistemlerinin en önemli yönlerinden biri, birden çok programı 
+çalıştırabilmeleridir.
+Multiprogramming ile process’ler organize edilerek CPU'nun her zaman 
+yürütecek bir process’e sahip olması sağlanır, Multiprogramming işletim 
+sistemlerinde birden fazla program aynı anda bellekte tutulur, işletim 
+sistemi bu programlardan birini  yürütmek için seçer.
+böylece hem CPU’nun verimliliği artırılır hem de kullanıcılar (genellikle 
+birden fazla program çalıştırmak isterler) memnun edilir.
+Yürütülmekte olan process’in tamamlanması için  I/O gibi bazı işlemler 
+gerekebilir. Multiprogramming olmayana bir sistemde process’in beklediği 
+işlemler tamamlanana kadar CPU boşta bekler.
+Multiprogramming sitemde ise yürütülmek üzere başka bir process seçilir, bu 
+process de tamamlanmak için beklemek zorunda kalırsa yürütülmek üzere başka 
+bir process seçilir.Temel kavramlar
+3\n--- PAGE 3 ---\nProcess’in beklediği işlemler tamamlandığında process OS tarafından tekrar 
+yürütülür. 
+En az bir process yürütülmek üzere hazır olarak beklediği müddetçe, CPU 
+asla boşta kalmaz.
+Multicore bir sistemde, yürütülmeye hazır process olduğu müddetçe CPU'yu 
+meşgul tutma kavramı, sistemdeki tüm işlemci çekirdeklerine genişletilir.
+Multitasking, multiprogramming’in genişletilmiş halidir. Multitasking
+sistemlerde CPU, aralarında geçiş yaparak birden fazla process’i yürütür, 
+ancak bu geçişler sık sık meydana gelir. 
+Böylece hem CPU verimliliği hem de sistemin kullanıcıya cevap 
+verebilirliliği artmış olur.
+Birden fazla process aynı anda çalışmaya hazırsa, işletim sistemi hangi 
+process’in çalışacağını seçmelidir. Bu karar CPU Scheduling ile verilir.Temel kavramlar
+4\n--- PAGE 4 ---\nTemel kavramlar
+Multiprogramming Multitasking
+5\n--- PAGE 5 ---\nHemen hemen tüm p rocess ‘lerin yürütülmesi iki durum 
+arasında dönüp duran bir döngüde şeklindedir: CPU 
+execution veI/Owait .
+CPU burst :Process’in, bir I/O için beklemeye başlayana 
+veya başka bir process tarafından interrupt edilinceye 
+kadar CPU‘yu kullandığı süredir
+I/Oburst : Process’in CPU zamanına ihtiyaç duymadan önce 
+girdi -çıktı için beklediği zamandır.
+Process yürütme, bir CPU burst (CPU patlaması) ile başlar, 
+bunu bir I/Oburst (I/O patlaması) izler, ardından başka bir 
+CPU burst , ardından başka bir I/Oburst takip eder. En son 
+CPU burst ile processin bir sistem talebiyle yürütülmesi 
+sonlandırılır.CPU Burst Cycle veI/OBurst Cycle
+6\n--- PAGE 6 ---\nCPU burst süresi; process’ten 
+process’e, bilgisayardan bilgisayara çok 
+farklılık gösterse de şekildeki grafiğe 
+benzer bir frekans eğrisine sahip olma 
+eğilimindedirler.
+Eğri genellikle, çok sayıda kısa CPU 
+burst ve az sayıda uzun CPU burst ile 
+exponential ya da hyperexponential
+karakterdedir. 
+Yani process’lerin CPU üzerinde 
+kaldıkları süreler genellikle çok sayıda 
+kısa aralıklar şeklinde olmaktadır.CPU Burst Cycle veI/O Burst Cycle
+7\n--- PAGE 7 ---\nCPU her boşta kaldığında , işletim sistemi nin ready queue’den bir
+process’i yürütmek üzere seçme si gerekir .
+Bu seçme işlemi short -term scheduler veya diğer ismiyle CPU 
+scheduler tarafından gerçekleştirilir.
+Ready queue , ilk gelen ilk çıkar (firs-in-first-out, FIFO) olmak zorunda
+değildir ,priority queue, ağaç, sırasız bağlı liste şeklinde de
+oluşturulabilir .
+Ready queue hangi şekilde olursa olsun ready queue’de yer alan 
+process’ler CPU’da çalışma şansı elde etmek üzere sıralanırlar.
+Kuyruk içindeki kayıtlarda, process control block (PCB) tutulur.CPU Scheduler
+8\n--- PAGE 8 ---\nCPU-scheduling kararı 4durum altında gerçekleştirilir:
+1. Bir process çalışma ( running ) durumundan bekleme ( waiting ) 
+durumuna geçtiğinde (örneğin process I/O isteğinde bulunduğunda),
+2. Birprocess running durumundan ready durumuna geçtiğinde (örneğin kesme 
+olduğunda),
+3. Bir process waiting durumundan ready durumuna geçtiğinde 
+(örneğin beklenen I/O tamamlandığında),
+4. Birprocess sonlandırıldığında .
+Eğer scheduling işlemi 1.ve4.durumlarda gerçekleşmişse ,scheduling şeması 
+nonpreemptive veya cooperative scheduling olur, bu durumda scheduling
+açısından bir seçim yoktur, hazır kuyruğunda sırada bekleyen  process CPU’ya 
+geçer.
+Nonpreemptive scheduling’te , CPU bir process’e tahsis edildiğinde, 
+process sonlanıncaya veya bekleme durumuna geçeneğe kadar 
+process CPU’da kalır.Preemptive and Nonpreemptive Scheduling
+9\n--- PAGE 9 ---\nEğer scheduling işlemi 2.ve3.durumlarda gerçekleşmişse scheduling şeması
+preemptive scheduling olur.
+Preemptive scheduling ‘deverilerprocess’ler arasında paylaşı ldığında race
+condition söz konusu olabilir .
+Preemption , işletim sistemi çekirdeğinin tasarımını da etkiler. Çekirdek bir 
+process adına önemli bir işi yürütürken (örneğin I/O kuyrukları gibi önemli 
+çekirdek verilerini değiştirilirken), process bu değişikliklerin ortasında 
+preempted olursa yani process CPU’dan çıkarılıp başka bir process CPU’ya 
+geçerse ve çekirdeğin aynı yapıyı okuması veya değiştirmesi gerekirse kaos 
+başlar.
+Preemptive kernel sistemlerde, paylaşılan çekirdek veri yapılarına erişilirken 
+race condition ’ıönlemek için mutex locks gibi mekanizmalar kullanılır.Preemptive and Nonpreemptive Scheduling
+10\n--- PAGE 10 ---\nNonpreemptive kernel yürütme modeli, görevlerin belirli bir zaman dilimi 
+içinde tamamlaması gerektiği gerçek zamanlı hesaplamalar için zayıf bir 
+modeldir. 
+Çünkü nonpreemptive kernel sistem, context switch yapmadan önce bir 
+sistem çağrısının tamamlanması için veya bir processin bloke olması için (I/O 
+için beklemeye geçmesi için) veya sonlanması için bekler.
+Windows, macOS , Linux ve UNIX dahil hemen hemen tüm modern işletim 
+sistemleri, preemptive scheduling algoritmaları kullanır. Preemptive and Nonpreemptive Scheduling
+11\n--- PAGE 11 ---\nDispatcher , CPU scheduling işlevini gerçekleştiren bileşen dir.
+Dispatcher , short -term scheduler tarafından seçilen process’in CPU‘ya 
+geçmesini sağlayan modüldür.
+Dispatcher aşağıdaki işlevleri içermektedir:
+Context swichting
+Kullanıcı moduna geçiş
+Programı kaldığı yerden devam ettirmek için kullanıcı programında uygun konuma
+atlama
+Dispatcher’ın çokhızlı birşekilde geçiş yapması zorunludur.
+Dispatcher’ın bir process’i durdurup diğer process’i başlatıncaya kadar 
+geçen süreye dispatch latency deni r.Dispatcher
+12\n--- PAGE 12 ---\nKonular
+Temel kavramlar 
+Scheduling kriterleri
+Scheduling algoritmaları
+Thread Scheduling
+Multiple -Processor Scheduling
+Gerçek zamanlı ( Real -Time )CPU scheduling
+13\n--- PAGE 13 ---\nCPU scheduling algoritmaları çoksayıda farklı kritere göre karşılaştırılır:
+CPU utilization :CPU’nun olabildiği kadar kullanımda olması istenir. Kavramsal 
+olarak C PUkullanım oranı %0-%100 arasındadır. Gerçek sistemlerde bu oran
+%40 ile%90 arasındadır.
+Throughput :Belirli bir zaman biriminde yürütülmesi tamamlanan process sayısıdır.
+Turnaround time: Bir processin arz edilmesinden tamamlanmasına kadar geçen 
+toplam süredir. Bir process’in hazır kuyruğunda bekleme süresi, CPU’da yürütülme 
+süresi veI/Oiçingeçen sürelerin toplamıdır.
+Waiting time: Birprocess’in hazır kuyruğunda beklediği süredir. CPU scheduling
+algoritması, bir processin yürütülme süresini ve I/O gerçekleştirme süresini 
+etkilemez. Ancak bir process’in hazır kuyruğunda beklemek için harcadığı süreyi 
+etkiler.
+Response time: Bir process’e bir istekte bulunulmasından process’ten ilk 
+yanıtın üretilmesine kadar geçen süredir. (cevabın tamamını vermek için geçen 
+süre değil, cevap vermeye ilk başlanılan zamana kadar geçen süredir.)
+CPU utilization’ı ve throughput’u maksimum yapmak; turnaround time, 
+waiting time ve response time’ı minimum yapmak amaçlanır.Scheduling kriterleri
+14\n--- PAGE 14 ---\nKonular
+Temel kavramlar 
+Scheduling kriterleri
+Scheduling algoritmaları
+Thread Scheduling
+Multiple -Processor Scheduling
+Gerçek zamanlı ( Real -Time )CPU scheduling
+15\n--- PAGE 15 ---\nCPU scheduling algoritmaları, hazır kuyruğunda bekleyen 
+process’lerden hangisinin CPU’ya geçeceğini belirlerler.
+Bu bölümde verilen scheduling algoritmaları tek bir işlemci 
+çekirdeğine sahip tek bir CPU için ele alınmıştır, bu nedenle sistem bir 
+seferde yalnızca bir process’i çalıştırabilir.
+First-Come ,First-Served Scheduling
+Shortest -Job-First Scheduling
+Priority Scheduling
+Round -Robin Scheduling
+Multilevel Queue Scheduling
+Multilevel Feedback Queue SchedulingScheduling algoritmaları
+16\n--- PAGE 16 ---\nEn basit CPU scheduling algoritmasıdır ve first-come first served (FCFS) 
+şeklinde çalışır.
+CPU’ya ilkistek yapan process, CPU’ya ilkgeçen process olur.
+FIFO kuyruk yapısıyla yönetilebilir.
+Bu algoritmada ortalama waiting time genellikle yüksektir.
+Waiting time process’lerin kuyruğa geliş sırasına göre çok 
+değişmektedir.First -Come , First -Served Scheduling
+17\n--- PAGE 17 ---\nAşağıdaki 3 process için CPU’da çalışma süreleri msolarak verilmiştir.
+Process’ler P1, P2, P3 sırasıyla gelirse Gantt şeması aşağıdaki gibidir.
+Ortalama waiting time (0+24+27)/3=17msolur.
+P2,P3, P1sırasıyla gelirse Gantt şeması aşağıdaki gibidir.
+Ortalama waiting time (0+3+6)/3=3msolur.First -Come , First -Served Scheduling
+18\n--- PAGE 18 ---\nFCFS algoritmasında, process’lerin çalışma süreleri çok farklıysa
+ortalama bekleme süreleri çokdeğişken olur.
+Çok sayıda kısa süreli process’in uzun süreli birprocess’in CPU’dan 
+çıkmasını beklemesine convoy effect denilmektedir. Bir tane CPU -
+bound ve çok sayıda I/O bound process’in olduğu bir durumda CPU’da 
+kısa süreliğine çalıştırılacak I/O bound process’ler CPU -bound
+processin işini bitirmesini bekler.
+FCFS Scheduling algoritması nonpreemtive’dir , bir process’e CPU tahsis
+edildiğinde process sonlanana veya I/O isteği yapana kadar CPU’yu
+elinde tutar.
+FCFS algoritması, her process’in düzenli aralıklarla CPU'da yer 
+almasının önemli olduğu interaktif sistemler için uygun değildir. 
+Bir process’in CPU'yu uzun süre tutmasına izin vermek interaktif 
+sistemin çalışmasını olumsuz etkiler.First -Come , First -Served Scheduling
+19\n--- PAGE 19 ---\nShortest -Job-First Scheduling (SJF) algoritmasında, CPU’ya bir sonraki
+işlem süresi enkısa olan (shortest -next -CPU-burst) process atanır.
+Gant şeması ve o rtalama waiting time ?Shortest -Job-First Scheduling
+20\n--- PAGE 20 ---\nShortest -Job-First Scheduling (SJF) algoritmasında, CPU’ya bir sonraki
+işlem süresi enkısa olan (shortest -next -CPU-burst) process atanır.
+Ortalama waiting time ,(0+3+9+16)/4=7ms’dir.FCFS
+kullanılsaydı 10,25 msolurdu ((0+6+14+21)/4).
+SJFalgoritması minimum ortalama waiting time’yi elde eder.Shortest -Job-First Scheduling
+21\n--- PAGE 21 ---\nSJF algoritmasındaki en büyük zorluk, sonraki çalışma süresini (burst
+time) tahmin etmektir.
+Long -term (job) scheduling içinkullanıcının belirlediği süre alınabilir.
+SJFalgoritması genellikle long -term scheduling içinkullanılır ,short -
+term scheduling seviyesinde kullanılamaz.
+Short -term scheduling’te CPU’da sonraki çalışma süresini bilmek 
+mümkün değildir ,sonraki çalışma süresi tahmin edilmeye çalışılır.
+Sonraki çalışma süresinin önceki çalışma süresine benzer 
+olacağı beklenir.Shortest -Job-First Scheduling
+22\n--- PAGE 22 ---\nSonraki CPU burst süresi, önceki CPU burst sürelerinin üstel ortalama
+(exponential average) değeri ile tahmin edilebilir :
+tn,isen.CPU burst süresini,
+τn+1, tahmin edile ceksonraki CPU burst süresini ,
+, 0 < < 1 aralığında sabit bir değeri gösterir. ( genellikle ½dir)
+tnen son bilgiyi içerirken τno ana kadar olan tüm geçmiş bilgiyi saklar.*Sonraki CPU Burst Süresinin Belirlenmesi
+23\n--- PAGE 23 ---\nSJFalgoritması preemptive veya nonpreemptive olabilir. 
+Processler arasında seçim, önceki bir process devam ederken hazır 
+kuyruğa yeni bir process geldiğinde ortaya çıkar.
+Yeni gelen process’in bir sonraki CPU burst süresi, şu anda 
+yürütülen process’in geriye kalan süresinden daha kısa olabilir, bu 
+durumda:
+preemptive SJF çalışmakta olan process’i askıya alır , 
+nonpreemptive SJFçalışmakta olan process’in sonlanmasına
+izinverir.
+Preemptive SJF, shortest -remaining -time -first scheduling
+olarak adlandırılır.Shortest -Job-First Scheduling
+24\n--- PAGE 24 ---\n=1/2veτ0=10içinbir ortalama eksponansiyel görülmektedir .Shortest -Job-First Scheduling
+25\n--- PAGE 25 ---\nProcess’ler gösterilen zamanlarda hazır kuyruğuna ulaşırsa ve belirtilen CPU burst
+sürelerine ihtiyaç duyarsa, sonuçta ortaya çıkan preemtive SJF scheduling için 
+Gantt şeması ve ortalama bekleme süresi ? Example of Shortest -remaining -time -first
+26\n--- PAGE 26 ---\nProcess’ler gösterilen zamanlarda hazır kuyruğuna ulaşırsa ve belirtilen CPU burst
+sürelerine ihtiyaç duyarsa, sonuçta ortaya çıkan preemtive SJF scheduling için 
+Gantt şeması şöyledir:Example of Shortest -remaining -time -first
+P4
+0 1 26P1P2
+10P3P1
+5 17
+27Bekleme süresiP1 P2 P3 P4
+(10-1) (1-1) (17-2) (5-3)
+Ortalama bekleme süresi (10-1)+(1 -1)+(17 -2)+(5-3)]/4 = 6.5 ms
