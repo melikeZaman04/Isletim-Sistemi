@@ -1205,3 +1205,7 @@ e- Turnaround, Response
 *   **Cevap:** **b- CPU utilization, Swapping**
 *   *Açıklama:* Geri kalan tüm şıklar CPU algoritmalarında hesaplanan performans kriterleridir. Ancak "Swapping" bir bellek (memory management) işlemidir, CPU scheduling algoritma başarısı ölçüm kriteri değildir.
 
+
+
+
+gfsdg
