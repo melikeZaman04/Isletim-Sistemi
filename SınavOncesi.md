@@ -157,7 +157,7 @@ Paging modelinde bellek yönetimi, programcının gördüğü **Mantıksal Belle
 * **t = 16:** Son kalan **P1** CPU'ya girer, kalan 7 ms'lik işini tamamlar ve **t = 23** anında sistem tüm işleri bitirir.
 
 ### 📊 Gantt Şeması (Gantt Chart)
-```text
+
 +------+------+------+------+------+------+
 |  P1  |  P2  |  P4  |  P2  |  P3  |  P1  |
 +------+------+------+------+------+------+
